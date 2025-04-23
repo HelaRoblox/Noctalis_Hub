@@ -19,11 +19,11 @@ local Init = library:Init()
 local Tab1 = Init:NewTab("Player")
 local Section1 = Tab1:NewSection("Sliders")
 
-Tab1:NewSlider("WalkSpeed", "Set WalkSpeed", true, "/", {min = 16, max = 500, default = 16}, function(value)
+Tab1:NewSlider("WalkSpeed", "Set WalkSpeed", true, "/", {min = 0, max = 1000, default = 16}, function(value)
     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
 end)
 
-Tab1:NewSlider("JumpPower", "Set Jump Power", true, "/", {min = 50, max = 200, default = 50}, function(value)
+Tab1:NewSlider("JumpPower", "Set Jump Power", true, "/", {min = 0, max = 1000, default = 50}, function(value)
     game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
 end)
 
