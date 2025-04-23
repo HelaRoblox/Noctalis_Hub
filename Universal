@@ -1,0 +1,257 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Consistt/Ui/main/UnLeaked"))()
+
+local Wm = library:Watermark("Noctalis Hub | g-v1.0.2 | " .. library:GetUsername() .. " | rank: " .. library.rank)
+local FpsWm = Wm:AddWatermark("fps: " .. library.fps)
+coroutine.wrap(function()
+    while wait(0.75) do
+        FpsWm:Text("fps: " .. library.fps)
+    end
+end)()
+
+local Notif = library:InitNotifications()
+local LoadingXSX = Notif:Notify("Loading Noctalis Universal please wait.", 3, "information")
+
+library.title = "Noctalis Universal"
+library:Introduction()
+wait(1)
+local Init = library:Init()
+
+local Tab1 = Init:NewTab("Player")
+local Section1 = Tab1:NewSection("Sliders")
+
+Tab1:NewSlider("WalkSpeed", "Set WalkSpeed", true, "/", {min = 16, max = 500, default = 16}, function(value)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+Tab1:NewSlider("JumpPower", "Set Jump Power", true, "/", {min = 50, max = 200, default = 50}, function(value)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+end)
+
+local Section2 = Tab1:NewSection("Toggles")
+
+local InfiniteJumpEnabled = false
+local infiniteJumpToggle = Tab1:NewToggle("Infinite Jump", "Jump infinitely", function(state)
+    InfiniteJumpEnabled = state
+end)
+infiniteJumpToggle:Set(false)
+
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+UserInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+local Noclip = false
+local noclipToggle = Tab1:NewToggle("Noclip", "Walk through walls", function(state)
+	Noclip = state
+end)
+noclipToggle:Set(false)
+
+local RunService = game:GetService("RunService")
+
+RunService.Stepped:Connect(function()
+	if Noclip and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+		for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = false
+			end
+		end
+	end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+	char:WaitForChild("HumanoidRootPart")
+	char:WaitForChild("Humanoid")
+	if not Noclip then
+		task.wait(1)
+		for _, part in pairs(char:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = true
+			end
+		end
+	end
+end)
+
+local Tab2 = Init:NewTab("Visuals")
+local Section3 = Tab2:NewSection("Toggles")
+
+local ESPEnabled = false
+local espToggle = Tab2:NewToggle("ESP", function(state)
+    ESPEnabled = state
+    if ESPEnabled then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/zachisfunny/RobloxESP/main/ESP.lua"))()
+    else
+        print("ESP Disabled")
+    end
+end)
+espToggle:Set(false)
+
+local XRayEnabled = false
+local xrayToggle = Tab2:NewToggle("X-RAY", function(state)
+    XRayEnabled = state
+    if XRayEnabled then
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsDescendantOf(game.Players.LocalPlayer.Character) then
+                obj.Transparency = 0.7
+            end
+        end
+    else
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsDescendantOf(game.Players.LocalPlayer.Character) then
+                obj.Transparency = 0
+            end
+        end
+    end
+end)
+xrayToggle:Set(false)
+
+local lighting = game:GetService("Lighting")
+local fullBrightOn = false
+local originalSettings = {
+    Brightness = lighting.Brightness,
+    Ambient = lighting.Ambient,
+    OutdoorAmbient = lighting.OutdoorAmbient,
+    ClockTime = lighting.ClockTime,
+    FogEnd = lighting.FogEnd,
+    GlobalShadows = lighting.GlobalShadows,
+    ExposureCompensation = lighting.ExposureCompensation
+}
+
+local function enableFullBright()
+    lighting.Brightness = 2
+    lighting.Ambient = Color3.new(1, 1, 1)
+    lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+    lighting.ClockTime = 12
+    lighting.FogEnd = 100000
+    lighting.GlobalShadows = false
+    lighting.ExposureCompensation = 0.75
+end
+
+local function disableFullBright()
+    for setting, value in pairs(originalSettings) do
+        lighting[setting] = value
+    end
+end
+
+local fullBrightToggle = Tab2:NewToggle("Full Bright", "Toggle Full Bright", function(state)
+    fullBrightOn = state
+    if fullBrightOn then
+        enableFullBright()
+    else
+        disableFullBright()
+    end
+end)
+fullBrightToggle:Set(false)
+
+local Tab3 = Init:NewTab("Others")
+
+local Section4 = Tab3:NewSection("Teleport")
+
+local Textbox1 = Tab3:NewTextbox("Teleport to Player", "", "teleportBox", "all", "small", true, false, function(val)
+    local partialName = val
+    local localPlayer = game.Players.LocalPlayer
+    local foundPlayer = nil
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= localPlayer and player.Name:lower():sub(1, #partialName) == partialName:lower() then
+            foundPlayer = player
+            break
+        end
+    end
+
+    if foundPlayer and foundPlayer.Character and foundPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = foundPlayer.Character.HumanoidRootPart
+        local myChar = localPlayer.Character
+        if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+            myChar:MoveTo(hrp.Position + Vector3.new(2, 0, 2)) -- Yakınına ışınla
+            Notif:Notify("Teleported to " .. foundPlayer.Name, 3, "success")
+        end
+    else
+        Notif:Notify("Player not found", 3, "error")
+    end
+end)
+
+local Tab4 = Init:NewTab("Fly")
+
+local Section4 = Tab4:NewSection("Flight")
+
+local FlyEnabled = false
+local FlySpeed = 50
+local bodyGyro, bodyVelocity
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local function startFly()
+    -- Fly Başlat
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.P = 90000
+    bodyGyro.maxTorque = Vector3.new(9000000000, 9000000000, 9000000000)
+    bodyGyro.cframe = humanoidRootPart.CFrame
+    bodyGyro.Parent = humanoidRootPart
+
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.Parent = humanoidRootPart
+
+    RunService.Heartbeat:Connect(function()
+        if FlyEnabled then
+            local direction = Vector3.zero
+
+            -- Kullanıcı tuşlarına göre yön belirle
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                direction = direction + humanoidRootPart.CFrame.LookVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                direction = direction - humanoidRootPart.CFrame.LookVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                direction = direction - humanoidRootPart.CFrame.RightVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                direction = direction + humanoidRootPart.CFrame.RightVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                direction = direction + humanoidRootPart.CFrame.UpVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                direction = direction - humanoidRootPart.CFrame.UpVector
+            end
+
+            -- Fly Hızı ayarla
+            bodyVelocity.Velocity = direction.Unit * FlySpeed
+            bodyGyro.CFrame = humanoidRootPart.CFrame
+        end
+    end)
+end
+
+local function stopFly()
+    -- Fly'i Durdur
+    if bodyGyro then bodyGyro:Destroy() end
+    if bodyVelocity then bodyVelocity:Destroy() end
+end
+
+-- Fly Speed Slider
+Tab4:NewSlider("Fly Speed", "Adjust flying speed", true, "/", {min = 1, max = 100, default = 50}, function(value)
+    FlySpeed = value
+end)
+
+-- Fly Toggle
+Tab4:NewToggle("Fly", "Toggle Fly Mode", function(state)
+    FlyEnabled = state
+    if FlyEnabled then
+        startFly()
+    else
+        stopFly()
+    end
+end):Set(false)
