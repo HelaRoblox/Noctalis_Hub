@@ -237,5 +237,5 @@ local Button1 = Tab5:NewButton("Infinite Yield", function()
 end)
 
 local Button2 = Tab5:NewButton("Dex Explorer", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
 end)
