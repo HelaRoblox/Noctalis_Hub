@@ -15,6 +15,17 @@ library:Introduction()
 wait(1)
 local Init = library:Init()
 
+function UpdateAimLockState()
+    if Settings.Enabled then
+        IsToggled = true
+    else
+        IsToggled = false
+        BeizerCurve.ManagerA:StopCurrent()
+        BeizerCurve.ManagerB:StopCurrent()
+    end
+end
+
+
 --------------------------------------------------------------------------------
 -- TAB 1: Player Settings
 --------------------------------------------------------------------------------
@@ -156,29 +167,10 @@ end
 Tab2:NewToggle("X-Ray", "See through objects", function(s) toggleXRay(s) end):Set(false)
 
 --------------------------------------------------------------------------------
--- TAB 3: Teleportation
+-- TAB 5: Flight Settings
 --------------------------------------------------------------------------------
-local Tab3 = Init:NewTab("🗂️ Teleport")
-local Section4_Teleport = Tab3:NewSection("Teleportation")
-
-Tab3:NewTextbox("Teleport to Player", "Enter a player's name", "teleportBox", "all", "small", true, false, function(val)
-    local target
-    for _, p in pairs(game.Players:GetPlayers()) do
-        if p ~= LocalPlayer and p.Name:lower():sub(1, #val) == val:lower() then target = p; break end
-    end
-    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-        LocalPlayer.Character:MoveTo(target.Character.HumanoidRootPart.Position + Vector3.new(2, 0, 2))
-        Notif:Notify("Teleported to " .. target.Name, 3, "success")
-    else
-        Notif:Notify("Player not found", 3, "error")
-    end
-end)
-
---------------------------------------------------------------------------------
--- TAB 4: Flight Settings
---------------------------------------------------------------------------------
-local Tab4 = Init:NewTab("✈️ Flight")
-local Section4_Flight = Tab4:NewSection("Flight Controls")
+local Tab5 = Init:NewTab("✈️ Flight")
+local Section4_Flight = Tab5:NewSection("Flight Controls")
 
 local FlyEnabled = false
 local FlySpeed = 50
@@ -221,21 +213,35 @@ local function stopFly()
     if bodyVelocity then bodyVelocity:Destroy() end
 end
 
-Tab4:NewSlider("Fly Speed", "Adjust flying speed", true, "/", {min = 1, max = 100, default = 50}, function(v)
+Tab5:NewSlider("Fly Speed", "Adjust flying speed", true, "/", {min = 1, max = 100, default = 50}, function(v)
     FlySpeed = v
 end)
 
-Tab4:NewToggle("Fly", "Toggle Fly Mode", function(s)
+Tab5:NewToggle("Fly", "Toggle Fly Mode", function(s)
     FlyEnabled = s
     if s then startFly() else stopFly() end
 end)
 
-local Tab5 = Init:NewTab("📜 Scripts")
+--------------------------------------------------------------------------------
+-- TAB 6: Scripts
+--------------------------------------------------------------------------------
 
-local Button1 = Tab5:NewButton("Infinite Yield", function()
+local Tab6 = Init:NewTab("📜 Scripts")
+
+local Button1 = Tab6:NewButton("Infinite Yield", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end)
 
-local Button2 = Tab5:NewButton("Dex Explorer", function()
+local Button2 = Tab6:NewButton("Dex Explorer", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+end)
+
+--------------------------------------------------------------------------------
+-- TAB 7: Settings
+--------------------------------------------------------------------------------
+
+local Tab7 = Init:NewTab("⚙️ Settings")
+
+local Keybind1 = Tab7:NewKeybind("Close Keybind", Enum.KeyCode.RightAlt, function(key)
+    Init:UpdateKeybind(Enum.KeyCode[key])
 end)
